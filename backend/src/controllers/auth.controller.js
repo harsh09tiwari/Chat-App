@@ -2,6 +2,8 @@
 import { generateToken } from "../lib/utils.js";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcryptjs"
+import cloudinary from "../lib/cloudinary.js"
+
 
 
 //   FOR SIGN UP A USER.
@@ -60,17 +62,18 @@ export const login = async (req, res)=> {
     
     try {
         if(!email || !password){
-            return res(400).json({message : "pleses provide all details"})
+            return res.status(400).json({message : "pleses provide all details"})
         }
+
     
         const user = await User.findOne({email})
         if (!user) {
-            return res(401).json({message: "Invalid credentials"})
+            return res.status(401).json({message: "Invalid credentials"})
         }
     
         const isPasswordCorrect = await bcrypt.compare(password, user.password)
         if (!isPasswordCorrect) {
-            return res(401).json({message : "Invalid credentials"})
+            return res.status(401).json({message : "Invalid credentials"})
         }
 
         generateToken(user._id, res)
@@ -93,14 +96,70 @@ export const login = async (req, res)=> {
 //  FOR LOGOUT A USER
 export const logout = (req, res)=> {
     try {
+        const user = req.user;
+
+        //   clearing the token cookie
         res.cookie("jwt", "", {maxAge:0})
         res.status(200).json({message: "Logged Out Successfully"})
     } catch (error) {
-        console.log("Enter in logout Controller", error.message);
+        console.log("Error in logout Controller", error.message);
         res.status(500).json({message : "Internal Server Error"})  
     }
 }
 
-export const deleteUser = (req, res)=> {
-    res.send("s route")
+
+//   FOR DELETEING THE USER
+export const deleteUser = async (req, res)=> {
+    try {
+        const userId = req.user._id
+        const user = await User.findByIdAndDelete(userId);
+
+        if (!user) {
+            return res.status(401).josn({message : "User not found"})
+        }
+        // clearing the token cookie
+        res.cookie("jwt", "", {maxAge : 0});
+        res.status(200).json({message : "User Account deleted successfully"})
+        
+    } catch (error) {
+        console.log("Error in deleteUser controller: ", error.message);
+        return res.status(500).json({message: "Internal Server Error"})
+    }
 }
+
+
+//   FOR UPDATING THE PROFILE PIC
+export const updateProfile = async (req, res) => {
+    try {
+        const {profilePic} = req.body;
+        const userId = req.user._id
+
+        if(!profilePic){
+            return res.status(404).json({message : "Profile pic is required"})
+        }
+
+        const uploadResponse = await cloudinary.uploader.upload(profilePic)
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,   //   id
+            {profilePic : uploadResponse},    //   updating
+            {new : true}    //   returning the latest update
+        )
+
+        return res(200).json(updatedUser)
+
+    } catch (error) {
+        console.log("Error in updateProfile Contoller: ", error.message);
+        return res.status(500).json({message : "Intenal Server Error"})        
+    }
+}
+
+export const checkAuth = async (req, res) => {
+    try {
+        console.log("heelo");
+        
+        res.status(200).json(req.user);    // sending back the user to the client
+    } catch (error) {
+        console.log("Error in checkAuth controller: ", error.message);
+        return res.status(500).json({message : "Internal Server Error"})
+    }
+} 
