@@ -153,10 +153,9 @@ export const updateProfile = async (req, res) => {
     }
 }
 
+//    getting the data of a login user
 export const checkAuth = async (req, res) => {
     try {
-        console.log("heelo");
-        
         res.status(200).json(req.user);    // sending back the user to the client
     } catch (error) {
         console.log("Error in checkAuth controller: ", error.message);
