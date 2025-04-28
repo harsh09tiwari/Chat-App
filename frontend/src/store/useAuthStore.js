@@ -22,5 +22,13 @@ export const useAuthStore = create((set) => ({
         }finally {
             set({isCheckingAuth: false})   //  //  set isCheckingAuth to false after checking the auth
         }
+    },
+
+    signUp : async (data) => {
+        try {
+            
+        } catch (error) {
+            
+        }
     }
 }))
