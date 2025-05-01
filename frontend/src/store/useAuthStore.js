@@ -42,6 +42,24 @@ export const useAuthStore = create((set) => ({
         }
     },
 
+
+
+    login : async (data) => {
+        set({isLoggingIn: true})  //  //  set isLoggingIn to true when logging in the user
+        try {
+            const res = await axiosInstance.post("/auth/login", data)  //  //  post request to log in the user
+            set({authUser: res.data})  //  //  set the authUser to the response data
+            toast.success("Logged in successfully")  //  //  show success message when user is logged in successfully
+        } catch (error) {
+            toast.error(error.response.data.message)  //  //  show error message when there is an error in logging in the user
+            //  //  error.response.data.message will give the error message from the server
+            console.log("Error in logging in", error.message);
+        } finally {
+            set({isLoggingIn: false})  //  //  set isLoggingIn to false after logging in the user
+        }
+    },
+
+
     logout : async () => {
         try {
             await axiosInstance.post("/auth/logout")  //  //  post request to log out the user
@@ -53,4 +71,5 @@ export const useAuthStore = create((set) => ({
             console.log("Error in logging out", error.message);
         }
     },
+
 }))
