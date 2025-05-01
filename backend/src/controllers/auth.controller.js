@@ -138,14 +138,14 @@ export const updateProfile = async (req, res) => {
             return res.status(404).json({message : "Profile pic is required"})
         }
 
-        const uploadResponse = await cloudinary.uploader.upload(profilePic)
+        const uploadResponse = await cloudinary.uploader.upload(profilePic)   
         const updatedUser = await User.findByIdAndUpdate(
             userId,   //   id
-            {profilePic : uploadResponse},    //   updating
+            {profilePic : uploadResponse.secure_url},    //   updating
             {new : true}    //   returning the latest update
         )
 
-        return res(200).json(updatedUser)
+        return res.status(200).json(updatedUser)
 
     } catch (error) {
         console.log("Error in updateProfile Contoller: ", error.message);

@@ -6,10 +6,12 @@ import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare } from "lucide-react";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);   //  //  show password or hide password
+  
   const [formData, setFormData] = useState({
     email: "",  
     password: "",
   });  // //  initial state of the form data
+  
   const { login, isLoggingIn } = useAuthStore();       // //  import login and isLoggingIn from useAuthStore for logging in the user
 
   const handleSubmit = async (e) => {

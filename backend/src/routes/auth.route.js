@@ -11,7 +11,7 @@ router.post("/login", login)
 router.post("/logout", protectRoute, logout)
 router.post("/delete", protectRoute, deleteUser)
 
-router.put("/update-profile", updateProfile)
+router.put("/update-profile", protectRoute, updateProfile)
 
 router.get("/check", protectRoute, checkAuth)
 

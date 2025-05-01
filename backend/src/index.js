@@ -11,6 +11,9 @@ const app = express();
 
 const PORT = process.env.PORT
 
+app.use(express.json({ limit: '20mb' })); // for JSON payloads
+app.use(express.urlencoded({ extended: true, limit: '20mb' })); // for URL-encoded payloads
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({ 
