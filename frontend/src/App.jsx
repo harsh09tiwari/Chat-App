@@ -34,7 +34,7 @@ const App = () => {
   
 
   return (
-    <div>
+    <div data-theme="bumblebee" >
       <Navbar/>
 
       <Routes>
