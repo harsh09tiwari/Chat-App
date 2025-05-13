@@ -1,18 +1,23 @@
 import React, { useEffect } from 'react'
+import { Route, Routes, Navigate } from 'react-router-dom'
+
+//  components
 import Navbar from './components/Navbar'
 
+//  pages
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import SettingsPage from './pages/SettingsPage'
 import SignUpPage from './pages/SignUpPage'
 import ProfilePage from './pages/ProfilePage'
 
-import { Route, Routes, Navigate } from 'react-router-dom'
-import { useAuthStore } from './store/useAuthStore.js'
 
-
+//  icons
 import {Loader} from "lucide-react"
 import { Toaster } from 'react-hot-toast'
+
+//   stores
+import { useAuthStore } from './store/useAuthStore.js'
 import { useThemeStore } from './store/useThemeStore.js'
 
 
@@ -37,19 +42,19 @@ const App = () => {
   
 
   return (
-    <div data-theme="theme" >
-      <Navbar/>
+    <div data-theme={theme} >
+
+      <Navbar/>   {/* // its a navbar component which is used in all the pages */}
 
       <Routes>
-        <Route path="/" element={authUser?<HomePage/>:<Navigate to="/login"/>}/>   //  //  if the user is not authenticated then redirect to login page 
-        <Route path="/signUp" element={!authUser?<SignUpPage/>:<Navigate to="/"/>}/>  //  //  if the user is authenticated then redirect to home page
-        <Route path="/login" element={!authUser?<LoginPage/>:<Navigate to="/"/>}/>  //  //  if the user is authenticated then redirect to home page
+        <Route path="/" element={authUser?<HomePage/>:<Navigate to="/login"/>}/>  {/*//  if the user is not authenticated then redirect to login page  */}
+        <Route path="/signUp" element={!authUser?<SignUpPage/>:<Navigate to="/"/>}/>  {/* //  if the user is authenticated then redirect to home page */}
+        <Route path="/login" element={!authUser?<LoginPage/>:<Navigate to="/"/>}/>  {/* //  if the user is authenticated then redirect to home page */}
         <Route path="/settings" element={<SettingsPage/>}/>
         <Route path="/profile" element={authUser?<ProfilePage/>:<Navigate to="/login"/>}/> 
       </Routes>
 
-      
-      <Toaster/>
+      <Toaster/> {/* show toast notifications */}
 
     </div>
   )

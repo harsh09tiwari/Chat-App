@@ -1,5 +1,5 @@
 export const THEMES = [
-    "light",
+  "light",
   "dark",
   "cupcake",
   "bumblebee",
@@ -9,7 +9,7 @@ export const THEMES = [
   "retro",
   "cyberpunk",
   "valentine",
-  "halloween",
+  "halloween", 
   "garden",
   "forest",
   "aqua",
@@ -34,5 +34,4 @@ export const THEMES = [
   "caramellete",
   "abyss",
   "silk",
-
 ]

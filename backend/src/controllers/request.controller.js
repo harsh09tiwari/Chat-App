@@ -13,12 +13,17 @@ const sendRequest = async (req, res) => {
             return res.status(400).json({message : "You cannot send request to yourself."})
         }
 
+        const receiver = await User.findById(receiverId);
+        if (!receiver) {
+            return res.status(404).json({message : "Receiver not found."})
+        }
+
         const existingRequest = await FriendRequest.findOne({
            $or: [
             {senderId : senderId, receiverId: receiverId},
             {receiverId : senderId, senderId: receiverId},
            ],
-           $in: {status: "pending", "accepted"}
+           status: {$in: ["pending", "accepted"]}
         }) 
          if (existingRequest) {
             return res.status(400).json({message : "Request already sent or accepted."})
@@ -28,8 +33,12 @@ const sendRequest = async (req, res) => {
             senderId,
             receiverId,
          })
+         
          await newFriendRequest.save()
-         return res.status(201).json({message: "Friend request sent successfully."})
+         return res.status(201).json({
+            message: "Friend request sent successfully.",
+            request: newFriendRequest
+         })
 
     } catch (error) {
         console.log("Error in sendRequest controller: ", error.message);

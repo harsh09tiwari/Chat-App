@@ -5,7 +5,7 @@ import { User } from "../models/user.model.js";
 
 export const getUsersForSidebar = async(req, res) => { 
  try {
-    const loggedInUserId = req.user._id
+    const loggedInUserId = req.user._id  
 
     //   {_id:{$ne:loggedInUserId}}     this is telling moongose to find all the user except the loggedIn user. =>  the current user  
     const filteredUsers = await User.find({_id:{$ne:loggedInUserId}}).select("-password")
@@ -57,6 +57,7 @@ export const sendMessage = async (req, res) => {
             const uploadResponse = cloudinary.uploader.upload(video)
             videoUrl = (await uploadResponse).secure_url
         }
+
 
 //   creating the new message
         const newMessage = new Message({
