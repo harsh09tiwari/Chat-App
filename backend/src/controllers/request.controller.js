@@ -33,12 +33,8 @@ const sendRequest = async (req, res) => {
             senderId,
             receiverId,
          })
-         
          await newFriendRequest.save()
-         return res.status(201).json({
-            message: "Friend request sent successfully.",
-            request: newFriendRequest
-         })
+         return res.status(201).json({message: "Friend request sent successfully.", request: newFriendRequest})
 
     } catch (error) {
         console.log("Error in sendRequest controller: ", error.message);
