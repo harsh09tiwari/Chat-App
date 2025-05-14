@@ -38,7 +38,7 @@ export const useChatStore = create((set, get) => ({  // Zustand store for managi
     },
 
     sendMessage : async(messageData) => {
-        const {selectedUser, message} = get();  // destructuring selectedUser and message from the state
+        const {selectedUser, messages} = get();  // destructuring selectedUser and message from the state
         try {
             const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData); // sending message to the server
             set({messages:[...messages, res.data]});  // updating the messages state with the new message

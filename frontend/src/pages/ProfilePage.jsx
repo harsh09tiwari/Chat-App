@@ -11,15 +11,15 @@ const ProfilePage = () => {
     const file = e.target.files[0] //  get the file from the input
     if (!file) return // if there is no file then return
 
-    const formData = new FileReader() //  create a new form data object
+    const reader = new FileReader();
 
-    formData.readAsDataURL(file) //  read the file as a data url
-
-    formData.onload = async () => {
-      const base64Image = formData.result //  get the base64 image from the file reader
-      setSelectedImage(base64Image) //  set the selected image to the base64 image
-      await updateProfile({ profilePic: base64Image }) //  //  update the profile with the selected image
-    }
+    reader.onloadend = async () => {
+      const base64Image = reader.result; // get the base64 result
+      setSelectedImage(base64Image);     // set the selected image
+      await updateProfile({ profilePic: base64Image }); // update profile with base64
+    };
+    reader.readAsDataURL(file); // start reading the file
+    
   }
   
 

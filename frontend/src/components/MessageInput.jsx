@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { useChatStore } from "../store/useChatStore"
 import { Image, Send } from "lucide-react"
+import toast from "react-hot-toast"
 
 function MessageInput() {
 
@@ -9,11 +10,57 @@ function MessageInput() {
     const fileInputRef = useRef(null)  // Reference to the file input element which means we can access the file input element directly and manipulate it, such as triggering a click event or resetting its value.
     const {sendMessage} = useChatStore()
 
-    const handleMediaChange = () => {}
 
-    const removeMedia = () => {}
+    //   function for handling the media change
+    //   this function will be called when a file is selected
+    const handleMediaChange = (e) => {
+        const file = e.target.files[0]     //   taking the first selected file
+        if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) {   //   checking if file is present or not
+            toast.error("Please select the correct file.")
+            return;
+        }
 
-    const handleSendMessage = async () => {}
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setMediaPreview(reader.result);  //   setting the media preview to the selected file
+        }
+        reader.readAsDataURL(file);  //   reading the file as a data URL
+    }
+
+    //   function for removing the media preview
+    //   this function will be called when the remove button is clicked
+    const removeMedia = () => {
+        setMediaPreview(null);   //   removing the media preview
+        if(fileInputRef.current) fileInputRef.current.value = null;  //   resetting the file input value if fileInputRef is present
+    }
+
+    //   function for sending the message
+    //   this function will be called when the form is submitted
+    const handleSendMessage = async (e) => {
+        e.preventDefault();
+        
+        if (!text.trim() && !mediaPreview) {  //   if both are fields are empty like no message and media
+            return;
+        }
+
+        try {
+            await sendMessage({  
+                text: text.trim(),
+                image: mediaPreview,
+            })
+
+            //   clearing the form for sending next message
+            setText("")
+            setMediaPreview(null)
+            if (fileInputRef.current) {
+                fileInputRef.current.value = ""
+            }
+        } catch (error) {
+            console.error("Failed to send message", error);
+            
+        }
+
+    }
 
   return (
      <div className="p-4 w-full">
