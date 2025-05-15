@@ -48,14 +48,16 @@ export const sendMessage = async (req, res) => {
         let imageUrl;
         if (image) {
             //   if user is giving the image upload it to cloudinary
-            const uploadResponse = cloudinary.uploader.upload(image)
-            imageUrl = (await uploadResponse).secure_url    //     giving url to iamgeUrl
+            const uploadResponse = await cloudinary.uploader.upload(image)
+            imageUrl =  uploadResponse.secure_url    //     giving url to iamgeUrl
         }
 
         let videoUrl;
         if (video) {
-            const uploadResponse = cloudinary.uploader.upload(video)
-            videoUrl = (await uploadResponse).secure_url
+            const uploadResponse =await cloudinary.uploader.upload(video, {
+                resource_type: "video"
+            })
+            videoUrl = uploadResponse.secure_url
         }
 
 
