@@ -3,10 +3,12 @@ import { useChatStore } from "../store/useChatStore"
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeleton/MessageSkeleton";
+import { useAuthStore } from "../store/useAuthStore";
 
 const ChatContainer = () => {
 
     const {messages, getMessages, isMessageLoading, selectedUser} = useChatStore();
+    const {authUser}= useAuthStore()
 
     //   for loading the message of user when we open any chat
     useEffect(() => {
@@ -22,12 +24,34 @@ const ChatContainer = () => {
     )
 
     return (
-        <div className="flex-1 flex-col overflow-auto p-15">
+        <div className="flex flex-col  h-full">
             <ChatHeader/>
 
-            <p>message..</p>
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                {messages.map((message) => (
+                    //  mathcing the message with the sender id and authUser id 
+                    <div key={message._id} 
+                    className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}>
+                        <div className="chat-image avatar">
+                            <div className="size-12 rounded-full border">
+                                <img 
+                                src={message.senderId === authUser._id ? authUser.profilePic || "/avatar.png": selectedUser.profilePic || "/avatar.png"}
 
-            <MessageInput/>
+                                alt="profile pic" />
+                            </div>
+                        </div>
+                        <div className="chat-header mb-1">
+                            <time className="text-xs opacity-70 ml-`">
+                                {message.createdAt}
+                            </time>
+                        </div>
+                    </div>   
+                ))}
+            </div>
+
+            <div className="sticky bottom-0  shadow-md"> {/* Fix MessageInput at the bottom */}
+                <MessageInput />
+            </div>
         </div>
     )
 }
