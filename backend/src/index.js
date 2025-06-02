@@ -2,12 +2,14 @@ import express from "express"   //  for using the import and export change the t
 import authRoutes from "./routes/auth.route.js";    //  route for user authentication
 import messageRoutes from "./routes/message.route.js"   //   route for message
 import dotenv from "dotenv"
+
 import {connectDB} from "./lib/db.js"
 import cookieParser from "cookie-parser"
 import cors from 'cors'; //  for using cors in express
 
+import { server, app } from "./lib/socket.js";
+
 dotenv.config()
-const app = express();
 
 const PORT = process.env.PORT
 
@@ -24,7 +26,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`server is running on port: ${PORT}`);
     connectDB()
 })

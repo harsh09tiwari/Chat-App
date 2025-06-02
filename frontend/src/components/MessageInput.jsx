@@ -59,7 +59,7 @@ function MessageInput() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
 
-    if (!text.trim() && !imagePreview) {
+    if (!text.trim() && !imagePreview && !video) {
       //   if both are fields are empty like no message and media
       return;
     }
