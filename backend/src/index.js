@@ -1,6 +1,8 @@
 import express from "express"   //  for using the import and export change the type in package.json to "module" from common.js
 import authRoutes from "./routes/auth.route.js";    //  route for user authentication
 import messageRoutes from "./routes/message.route.js"   //   route for message
+import friendRequestRoutes from "./routes/friends.route.js"; //  route for friend request
+
 import dotenv from "dotenv"
 
 import {connectDB} from "./lib/db.js"
@@ -8,6 +10,7 @@ import cookieParser from "cookie-parser"
 import cors from 'cors'; //  for using cors in express
 
 import { server, app } from "./lib/socket.js";
+
 
 dotenv.config()
 
@@ -25,6 +28,12 @@ app.use(cors({
 
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
+
+
+
+app.use("/api/friends", friendRequestRoutes) //  route for friend request    
+
+
 
 server.listen(PORT, () => {
     console.log(`server is running on port: ${PORT}`);

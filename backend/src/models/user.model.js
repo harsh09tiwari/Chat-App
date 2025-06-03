@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema(
         profilePic : {
             type : String,
             default : "",
-        }
+        },
+        friends: [{
+            type : mongoose.Schema.Types.ObjectId,
+            ref : "User",
+
+        }]
     },{timestamps : true}
 )
 
