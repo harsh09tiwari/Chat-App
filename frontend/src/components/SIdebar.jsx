@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useAuthStore } from "../store/useAuthStore";
+
 import SidebarSkeleton from "./skeleton/SidebarSkeleton";
 import { Users } from "lucide-react";
 
@@ -7,7 +9,8 @@ const Sidebar = () => {
 
     const { getUsers, users, selectedUser, setSelectedUser, isUserLoading } = useChatStore()
 
-    const onlineUsers = [];
+    const {onlineUsers} = useAuthStore();   // getting online users from the auth store   for showing online status in the sidebar
+    
 
     useEffect(() => {
         getUsers()

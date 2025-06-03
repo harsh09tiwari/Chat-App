@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
+import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({  // Zustand store for managing chat state
     //   state
@@ -45,6 +46,30 @@ export const useChatStore = create((set, get) => ({  // Zustand store for managi
         } catch (error) {
             toast.error(error.response.data.message);  // showing error message
         }
+    },
+
+    subscribeToMessage : () => {
+        const {selectedUser} = get();
+        if(!selectedUser) return;
+
+        const socket = useAuthStore.getState().socket
+
+        socket.on("newMessage", (newMessage) => {
+
+            const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
+            if (!isMessageSentFromSelectedUser) {    //   for sending the message to correct person.
+                return;
+            }
+
+            set({
+                messages : [...get().messages, newMessage ]   // spreading the existing messages and adding the new message so that it can be displayed in the chat
+            })
+        })
+    },
+
+    unsubscribeFromMessage: () => {
+        const socket = useAuthStore.getState().socket  // getting the socket from the auth store
+        socket.off("newMessage");  // removing the event listener for newMessage
     },
 
     setSelectedUser : (selectedUser) => set({selectedUser})  // setSelectedUser is a function that sets the selected user

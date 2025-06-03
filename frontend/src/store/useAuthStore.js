@@ -95,9 +95,21 @@ export const useAuthStore = create((set, get) => ({
 
     if (!authUser || get().socket?.connected) return; // for checking if user is logged in or not and is it already connected or not
 
-    const socket = io(BASE_URL);
-    socket.connect();
+    const socket = io(BASE_URL, {   // creating a new socket connection 
+        query: {   // query parameter to send userId to the server for socket connection and to identify the user
+            userId : authUser._id,  // userId from the authUser state
+        }
+    });
+
+    socket.connect();    // connect the socket
+
     set({ socket:socket })
+
+    //   in this we are getting the online users from the server and setting it to the onlineUsers state for the client side
+    socket.on("getOnlineUsers", (userIds)=>{
+        set({ onlineUsers : userIds })
+    })     //this should matched with io.emit("getOnlineUsers")  in socket.js file
+
   },
 
   disconnectSocket: () => {
@@ -105,4 +117,5 @@ export const useAuthStore = create((set, get) => ({
         get().socket.disconnect();
     }
   },
+  
 }));

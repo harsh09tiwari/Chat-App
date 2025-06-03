@@ -4,7 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
-  const { onlineUsers } = useAuthStore();
+  const { onlineUsers } = useAuthStore();  // Getting online users from the auth store to show online status in the chat header
 
   return (
     <div className="w-full p-2.5 border-b border-base-300">

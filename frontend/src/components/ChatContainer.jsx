@@ -8,14 +8,29 @@ import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
 
-    const {messages, getMessages, isMessageLoading, selectedUser} = useChatStore();
+    const {messages, getMessages, isMessageLoading, selectedUser, subscribeToMessage, unsubscribeFromMessage} = useChatStore();
     const {authUser}= useAuthStore()
+
+    const messageEndRef = useRef(null)
 
     //   for loading the message of user when we open any chat
     useEffect(() => {
         getMessages(selectedUser._id)
-    },[selectedUser._id, getMessages])
 
+        subscribeToMessage(); //  subscribing to the new message event
+
+        return () => {
+            unsubscribeFromMessage(); //  unsubscribing from the new message event
+        }
+    },[selectedUser._id, getMessages, subscribeToMessage, unsubscribeFromMessage]);
+
+
+    useEffect(() => {
+        if(messageEndRef.current && messages){
+            messageEndRef.current.scrollIntoView({ behaviour: "smooth"});
+        }
+    },[messages])  //  whenever messages change, it will scroll to the bottom of the chat container
+    
     if(isMessageLoading) return (
         <div className="flex-1 flex flex-col overflow-auto">
             <ChatHeader/>
@@ -32,7 +47,9 @@ const ChatContainer = () => {
                 {messages.map((message) => (
                     //  mathcing the message with the sender id and authUser id 
                     <div key={message._id} 
-                    className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}>
+                    className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+                    ref={messageEndRef}
+                    >
                         <div className="chat-image avatar">
                             <div className="size-12 rounded-full border">
                                 <img 
