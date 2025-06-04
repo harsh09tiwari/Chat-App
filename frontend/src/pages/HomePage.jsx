@@ -1,7 +1,7 @@
 import { useChatStore } from "../store/useChatStore.js"
 import NoChatSelected from "../components/NoChatSelected.jsx"
 import ChatContainer from "../components/ChatContainer.jsx"
-import Sidebar from "../components/Sidebar.jsx"
+import Sidebar from "../components/Sidebar1.jsx"
 
 const HomePage = () => {
   
