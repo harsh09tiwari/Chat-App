@@ -1,49 +1,53 @@
-import express from "express"   //  for using the import and export change the type in package.json to "module" from common.js
-import authRoutes from "./routes/auth.route.js";    //  route for user authentication
-import messageRoutes from "./routes/message.route.js"   //   route for message
-
+import express from "express"
+import authRoutes from "./routes/auth.route.js";
+import messageRoutes from "./routes/message.route.js"
 import dotenv from "dotenv"
-
 import {connectDB} from "./lib/db.js"
 import cookieParser from "cookie-parser"
-import cors from 'cors'; //  for using cors in express
-
+import cors from 'cors';
 import { server, app } from "./lib/socket.js";
-
-import path from "path"; //  for using path module in express
-
+import path from "path";
 
 dotenv.config()
 
 const PORT = process.env.PORT
-const __dirname = path.resolve(); //  for getting the current directory name
+const __dirname = path.resolve();
 
-app.use(express.json({ limit: '50mb' })); // for JSON payloads
-app.use(express.urlencoded({ extended: true, limit: '50mb' })); // for URL-encoded payloads
-
+// Basic middleware
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 app.use(cookieParser());
 app.use(cors({ 
-    origin : "http://localhost:5173",   //  //  origin of the frontend app
-    credentials : true,   //  //  allow credentials to be sent with the request
-}))  
+    origin : "http://localhost:5173",
+    credentials : true,
+}));
 
-// API routes
-app.use("/api/auth", authRoutes)
-app.use("/api/messages", messageRoutes)
+// Test basic route first
+app.get('/test', (req, res) => {
+    res.json({ message: 'Server is working' });
+});
 
+// Add API routes one by one to identify which one causes the issue
+console.log('Adding auth routes...');
+app.use("/api/auth", authRoutes);
+
+console.log('Adding message routes...');
+app.use("/api/messages", messageRoutes);
+
+// Only add production routes if we're in production
 if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "../frontend/dist"))); //  for serving the frontend files in production
-    
-    // Express 5.x compatible catch-all route - using the workaround pattern
-    app.get('/*\\w*', (req, res) => {
-        // Only serve index.html for non-API routes
-        if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-        } else {
-            res.status(404).json({ message: 'API route not found' });
-        }
-    });
+    console.log('Adding production static files...');
+    app.use(express.static(path.join(__dirname, "../frontend/dist")));
 }
+
+// Simple fallback without any wildcards
+app.use((req, res) => {
+    if (process.env.NODE_ENV === "production" && !req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+    } else {
+        res.status(404).json({ message: 'Route not found', path: req.path });
+    }
+});
 
 server.listen(PORT, () => {
     console.log(`server is running on port: ${PORT}`);
