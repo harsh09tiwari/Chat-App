@@ -1,7 +1,6 @@
 import express from "express"   //  for using the import and export change the type in package.json to "module" from common.js
 import authRoutes from "./routes/auth.route.js";    //  route for user authentication
 import messageRoutes from "./routes/message.route.js"   //   route for message
-import friendRequestRoutes from "./routes/friends.route.js"; //  route for friend request
 
 import dotenv from "dotenv"
 
@@ -29,9 +28,6 @@ app.use(cors({
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 
-
-
-app.use("/api/friends", friendRequestRoutes) //  route for friend request    
 
 
 
