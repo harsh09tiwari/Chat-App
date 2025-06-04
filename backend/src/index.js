@@ -22,30 +22,28 @@ app.use(express.json({ limit: '50mb' })); // for JSON payloads
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // for URL-encoded payloads
 
 app.use(cookieParser());
-app.use(express.json());
 app.use(cors({ 
     origin : "http://localhost:5173",   //  //  origin of the frontend app
     credentials : true,   //  //  allow credentials to be sent with the request
 }))  
 
+// API routes - these should come BEFORE the wildcard route
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist"))); //  for serving the frontend files in production
     
-    
-    app.get('*', (req, res) => {
-        // Only serve index.html for non-API routes
-        if (!req.path.startsWith('/api')) {
-            res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
-        } else {
-            res.status(404).json({ message: 'API route not found' });
-        } //  for serving the index.html file in production
+    // Catch-all handler: send back React's index.html file for non-API routes
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
     });
-    
+} else {
+    // Development route to handle non-existent routes
+    app.use("*", (req, res) => {
+        res.status(404).json({ message: 'Route not found' });
+    });
 }
-
 
 server.listen(PORT, () => {
     console.log(`server is running on port: ${PORT}`);
