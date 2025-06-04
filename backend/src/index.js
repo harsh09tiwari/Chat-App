@@ -35,8 +35,13 @@ if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "../frontend/dist"))); //  for serving the frontend files in production
     
     
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html")); //  for serving the index.html file in production
+    app.get('*', (req, res) => {
+        // Only serve index.html for non-API routes
+        if (!req.path.startsWith('/api')) {
+            res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
+        } else {
+            res.status(404).json({ message: 'API route not found' });
+        } //  for serving the index.html file in production
     });
     
 }
