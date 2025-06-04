@@ -10,10 +10,13 @@ import cors from 'cors'; //  for using cors in express
 
 import { server, app } from "./lib/socket.js";
 
+import path from "path"; //  for using path module in express
+
 
 dotenv.config()
 
 const PORT = process.env.PORT
+const __dirname = path.resolve(); //  for getting the current directory name
 
 app.use(express.json({ limit: '50mb' })); // for JSON payloads
 app.use(express.urlencoded({ extended: true, limit: '50mb' })); // for URL-encoded payloads
@@ -28,7 +31,15 @@ app.use(cors({
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 
-
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "../frontend/dist"))); //  for serving the frontend files in production
+    
+    
+    app.get("*", (req, res) => {
+        res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html")); //  for serving the index.html file in production
+    });
+    
+}
 
 
 server.listen(PORT, () => {
