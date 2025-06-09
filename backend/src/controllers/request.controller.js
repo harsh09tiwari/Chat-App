@@ -131,3 +131,23 @@ export const sendFriendRequest = async (req, res) => {
 
 
 
+// Get pending friend requests (recive by the current user)
+
+export const getReceivedRequests = async (req, res) => {
+    try {
+        const userId = req.user._id   //   current authenticated user
+        
+        const requests = await FriendRequest.find({
+            receiver: userId,
+            status: "pending"
+        }).populate("sender", "fullname email profilePic").sort({Credentials: -1})
+
+        res.json(requests)
+    } catch (error) {
+        console.log("Error in getReceivedRequest controller", error.message);
+        res.status(500).json({message: "Internal Server Error"})
+    }
+}
+
+
+
