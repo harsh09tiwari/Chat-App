@@ -49,3 +49,85 @@ export const searchUser = async (req, res) => {
     res.status(500).json({message: "Intenal Server Error"})
    } 
 }
+
+
+
+// Send friend request 
+
+export const sendFriendRequest = async (req, res) => {
+    try {
+        const {receiverEmail} = req.body;
+        const senderId = req.user._id;
+
+        // Find friend
+        const receiver = await User.findOne({email : receiverEmail.toLowerCase()})
+
+        if (!receiver) {
+            return res.statu(400).json({message : "User not found"})
+        }
+
+        // Check if sending request to self
+        if (senderId.toString() === receiver._id.toString()) {
+            return res.status(400).json({message : "Cannot send friend request to yourself"})
+        }
+
+        // check if already friends
+        const sender = await User.findById(senderId)
+        if (sender.friends.includes(receiver._id)) {
+            return res.status(400).json({message : "Already friends with this user"})
+        }
+
+        // check if the request is already exitst
+        const existingRequest  = await FriendRequest.findOne({
+            $or : [
+                {sender : senderId, receiver : receiver._id},
+                {sender : receiver._id, receiver : senderId}
+            ]
+        })    //   $or is like logical OR opearator
+        if (existingRequest) {
+            if (existingRequest.status === "pending") {
+                return res.status(400).json({ error: "Friend request already sent" });
+            } else if (existingRequest.status === "declined") {
+                // Allow resending if previously declined
+                existingRequest.status = "pending";
+                existingRequest.sender = senderId;
+                existingRequest.receiver = receiver._id;
+                await existingRequest.save();
+            }
+        }
+
+        // Creating Friend Request
+        const friendRequest = new FriendRequest({
+            sender : senderId,
+            receiver : receiver._id
+        })
+
+        await friendRequest.save();   // saving the request to database
+
+        //  Emit socket event for real time communication\
+        const io = req.app.get("io")
+        if (io) {
+            io.to(receiver._id.toString()).emit("friend_request_received", {
+                request: {
+                    _id: existingRequest?._id || friendRequest._id,
+                    sender: {
+                        _id: sender._id,
+                        fullName: sender.fullName,
+                        email: sender.email,
+                        profilePic: sender.profilePic
+                    },
+                    createdAt: existingRequest?.createdAt || friendRequest.createdAt
+                }
+            });
+        }
+
+        res.status(200).json({ message: "Friend request sent successfully" });
+
+    } catch (error) {
+        console.log("Eroor in sendFriendRequest controller", error.message);
+        res.status(500).json({message: "Internal Server Error"})
+    }
+}
+
+
+
