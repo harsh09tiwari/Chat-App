@@ -140,7 +140,9 @@ export const getReceivedRequests = async (req, res) => {
         const requests = await FriendRequest.find({
             receiver: userId,
             status: "pending"
-        }).populate("sender", "fullname email profilePic").sort({Credentials: -1})
+        }).populate("sender", "fullname email profilePic").sort({createdAt: -1})
+
+        //.populate() is used to automatically replace a referenced ObjectId with the actual document from another collection.
 
         res.json(requests)
     } catch (error) {
@@ -150,4 +152,22 @@ export const getReceivedRequests = async (req, res) => {
 }
 
 
+
+// get Send friend Request (sent by current User)
+export const getSentRequests = async (req, res) => {
+    try {
+        const userId = req.user._id
+    
+        const requests = await FriendRequest.findOne({
+            sender: userId,
+            status: "pending"
+        }).populate("receiver", "fullname email, profilePic").sort({createdAt : -1})
+
+        res.json(requests)
+
+    } catch (error) {
+        console.log("Error in getSentRequest", error.message);
+        res.status(500).json({message : "Internal Server Error"})
+    }
+}
 
