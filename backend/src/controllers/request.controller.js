@@ -25,8 +25,8 @@ export const searchUser = async (req, res) => {
 
     const existingRequest = await FriendRequest.findOne({
         $or : [
-            { senderId : currentUser._id, receiverId: user._id },
-            { senderId : user._id, receiverId : currentUser._id }
+            { sender : currentUser._id, receiver: user._id },
+            { sender : user._id, receiver : currentUser._id }
         ]
     })
 
@@ -171,3 +171,36 @@ export const getSentRequests = async (req, res) => {
     }
 }
 
+// Accept friend request
+export const acceptFriendRequest = async (req, res) => {
+    try {
+        const {requestId} = req.body
+        const userId = req.user._id
+
+        const friendRequest = await FriendRequest.findById(requestId)
+
+        if (!friendRequest) {
+            return res.stauts(400).json({message : "Friend request not found"})
+        }
+
+        // Check if current user is the receiver so that only authorize user can accept the request
+        if (friendRequest.receiver.toString() !== userId.toString()) {
+            return res.status(400).json({error: "Not authorized to accept this request"})
+        }
+        
+        if(friendRequest.status !== "pending"){
+            return res.status(400).json({message : "Request is not pending"})
+        }
+
+        // Update friend Request status
+        friendRequest.status = "accepted";
+        await friendRequest.save();
+
+        // Add each other as friend
+        
+
+    } catch (error) {
+        console.log("Error in acceptFriendRequest Controller");
+        res.status(500).json({message : "Internal Server Error"})
+    }
+} 
